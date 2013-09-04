@@ -54,13 +54,12 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Source/webserver/fs}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Source/bsp}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Source}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Source/bsp/stm32_config}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Source/bsp/CMSIS/Include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Source/bsp/Common}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Source/bsp/lwip_port}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Source/bsp/lwip_port/arch}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Source/bsp/lwip_port/netif}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Source/bsp/stm3220_eth_driver/inc}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Source/bsp/stm322xg_eval}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Source/bsp/STM32F2xx_StdPeriph_Driver/inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Source/lwip/src/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Source/lwip/src/include/ipv4/lwip}&quot;"/>
@@ -121,8 +120,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="qpc/ports/avr-xmega|qpc/ports/arm|qpc/ports/tms320c28x|qpc/ports/lint|qpc/examples|qpc/ports/pic24_dspic|bsp/Common|qpc/qf/source/qvanilla.c|bsp/stm322xg_eval|qpc/ports/arm-cortex/vanilla|qpc/ports/pic18|qpc/ports/h8|qpc/ports/80x86|lwip/src/core/ipv6|qpc/ports/m16c|qpc/ports/rx|lwip/test|qpc/doxygen|qpc/ports/tms320c55x|qpc/ports/80251|bsp/CMSIS/Device/ST/STM32F2xx/Source|bsp/stm32_eval.c|qpc/ports/avr|qpc/ports/coldfire|qpc/ports/msp430|qpc/ports/arm-cortex/qk/iar|qpc/ports/nios2" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Source"/>
 						<entry excluding="Source|FreeRTOS|STM32F2xx_StdPeriph_Lib" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="runtime/syscalls.c|qpc/ports/avr-xmega|qpc/ports/arm|qpc/ports/tms320c28x|qpc/ports/lint|qpc/examples|qpc/ports/pic24_dspic|bsp/Common|qpc/qf/source/qvanilla.c|bsp/stm322xg_eval|qpc/ports/arm-cortex/vanilla|qpc/ports/pic18|qpc/ports/h8|qpc/ports/80x86|lwip/src/core/ipv6|qpc/ports/m16c|qpc/ports/rx|lwip/test|qpc/doxygen|qpc/ports/tms320c55x|qpc/ports/80251|bsp/CMSIS/Device/ST/STM32F2xx/Source|bsp/stm32_eval.c|qpc/ports/avr|qpc/ports/coldfire|qpc/ports/msp430|qpc/ports/arm-cortex/qk/iar|qpc/ports/nios2" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Source"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

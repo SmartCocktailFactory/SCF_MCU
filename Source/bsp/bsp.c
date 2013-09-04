@@ -32,11 +32,11 @@
 * e-mail:                  info@quantum-leaps.com
 *****************************************************************************/
 #include "stm32f2xx.h"
-#include "stm32_eval.h"
-#include "stm322xg_eval.h"
-#include <omx_p207_eval/device/led/led.h>
-#include <omx_p207_eval/device/lcd/lcd.h>
-#include <omx_p207_eval/device/rs232/rs232.h>
+//#include "stm32_eval.h"
+//#include "stm322xg_eval.h"
+#include <omx_p207_eval/led/led.h>
+#include <omx_p207_eval/lcd/lcd.h>
+#include <omx_p207_eval/rs232/rs232.h>
 #include "qp_port.h"
 #include "dpp.h"
 #include "bsp.h"
@@ -108,15 +108,6 @@ void BSP_init(void) {
   /* initialize RS-232 serial port on Olimex P207 eval board */
   omxEval_rs232_init();
 
-	/* initialize LEDs, Key Button, and LCD on STM322XX-EVAL board */
-	// alu: TODO BSP_ButtonAndLED_Init();
-
-	/* initialize the Serial for printfs to the serial port */
-	// alu: TODO BSP_USART_Init();
-
-	/* initialize the EXTI Line0 interrupt used for testing */
-	// alu: TODO BSP_EXTI_Init();
-
 	/* initialize the ETH GPIO */
 	ETH_GPIO_Config();
 
@@ -126,50 +117,6 @@ void BSP_init(void) {
 	QS_OBJ_DICTIONARY(&l_SysTick_Handler);
 }
 
-/*..........................................................................*/
-void BSP_ButtonAndLED_Init(void) {
-
-	/* Initialize the LEDs on STM3220G board */
-	STM_EVAL_LEDInit(LED1);
-	STM_EVAL_LEDInit(LED2);
-	STM_EVAL_LEDInit(LED3);
-	STM_EVAL_LEDInit(LED4);
-}
-
-/*..........................................................................*/
-void BSP_USART_Init(void) {
-
-	/* USART resources configuration (Clock, GPIO pins and USART registers) ----*/
-	/* USART configured as follow:
-	    	  - BaudRate = 115200 baud
-	    	  - Word Length = 8 Bits
-	    	  - One Stop Bit
-	    	  - No parity
-	    	  - Hardware flow control disabled (RTS and CTS signals)
-	    	  - Receive and transmit enabled
-	 */
-	USART_InitTypeDef USART_InitStructure;
-	USART_InitStructure.USART_BaudRate = 115200;
-	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-	USART_InitStructure.USART_StopBits = USART_StopBits_1;
-	USART_InitStructure.USART_Parity = USART_Parity_No;
-	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-
-	STM_EVAL_COMInit(COM1, &USART_InitStructure);
-}
-
-/*..........................................................................*/
-void BSP_EXTI_Init(void) {
-	EXTI_InitTypeDef exti_init;
-
-	/* initialize the EXTI Line0 interrupt used for testing */
-	exti_init.EXTI_Mode    = EXTI_Mode_Interrupt;
-	exti_init.EXTI_Trigger = EXTI_Trigger_Rising;
-	exti_init.EXTI_Line    = EXTI_Line0;
-	exti_init.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&exti_init);
-}
 
 /*..........................................................................*/
 void QF_onStartup(void) {

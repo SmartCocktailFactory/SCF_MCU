@@ -28,9 +28,9 @@
 #include "qp_port.h"                                 /* QP port header file */
 #include "dpp.h"                   /* application events and active objects */
 #include "bsp.h"                       /* Board Support Package header file */
-#include "stm32_eval.h"
+//#include "stm32_eval.h"
 #include <stdio.h>
-#include <omx_p207_eval/device/lcd/lcd.h>
+#include <omx_p207_eval/lcd/lcd.h>
 
 
 Q_DEFINE_THIS_FILE

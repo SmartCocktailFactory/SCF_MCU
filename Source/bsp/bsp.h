@@ -38,10 +38,6 @@
 #define BSP_TICKS_PER_SEC 10000
 
 void BSP_init(void);
-void BSP_ButtonAndLED_Init(void);		        // Initialize LEDs on STM3220G
-void BSP_USART_Init(void);                 // Initialize the USART on STM3220G
-void BSP_EXTI_Init(void);
-void BSP_Display_Init(void);		                 // initialize the display
 void BSP_busyDelay(void);             // to artificially extend RTC processing
 void BSP_displyPhilStat(uint8_t n, char const *stat);
 #endif                                                                // bsp_h
