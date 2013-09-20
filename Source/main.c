@@ -78,5 +78,5 @@ int main(void) {
 
     QF_run();                                     /* run the QF application */
 
-    return 0;
+    return 1;
 }
