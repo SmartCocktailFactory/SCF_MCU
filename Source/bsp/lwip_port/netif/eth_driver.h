@@ -169,7 +169,7 @@ struct pbuf *low_level_receive(void);
 void low_level_transmit(struct netif *netif, struct pbuf *p);
 
 #ifdef Q_SPY
-    static uint8_t l_Ethernet_IRQHandler;
+    //static uint8_t l_Ethernet_IRQHandler;
 #endif
 
 #endif                                                      /* eth_driver_h */

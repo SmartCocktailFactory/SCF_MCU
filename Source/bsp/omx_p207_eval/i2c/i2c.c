@@ -59,7 +59,7 @@ void omxEval_i2c_init() {
   I2C_Cmd(OMX_EVAL_I2C_MODIO2, ENABLE);
 }
 
-ErrorStatus omsEval_i2c_write(uint8_t address, uint16_t length, const uint8_t* data) {
+ErrorStatus omsEval_i2c_write(uint8_t address, size_t length, const uint8_t* data) {
 
   __IO uint32_t Timeout = 0U;
 
@@ -100,7 +100,7 @@ ErrorStatus omsEval_i2c_write(uint8_t address, uint16_t length, const uint8_t* d
   return SUCCESS;
 }
 
-ErrorStatus omsEval_i2c_read(uint8_t address, uint16_t length, uint8_t* data) {
+ErrorStatus omsEval_i2c_read(uint8_t address, size_t length, uint8_t* data) {
 
   __IO uint32_t Timeout = 0;
 

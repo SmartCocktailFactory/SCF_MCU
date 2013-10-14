@@ -37,6 +37,7 @@
 #include <omx_p207_eval/led/led.h>
 #include <omx_p207_eval/lcd/lcd.h>
 #include <omx_p207_eval/rs232/rs232.h>
+#include <omx_p207_eval/i2c/i2c.h>
 #include "qp_port.h"
 #include "active_objects/ao_def.h"
 #include "bsp.h"
@@ -107,6 +108,9 @@ void BSP_init(void) {
 
   /* initialize RS-232 serial port on Olimex P207 eval board */
   omxEval_rs232_init();
+
+  /* initialize I2C on Olimex P207 eval board */
+  omxEval_i2c_init();
 
 	/* initialize the ETH GPIO */
 	ETH_GPIO_Config();
