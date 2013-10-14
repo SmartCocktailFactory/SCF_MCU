@@ -36,19 +36,14 @@ enum DPPSignals {
    DISPLAY_IPADDR_SIG,
    DISPLAY_CGI_SIG,
    DISPLAY_UDP_SIG,
-   PROCESS_UDP_SIG,        /* published by lwipmgr if a udp packet has been received */
+   PROCESS_UDP_SIG,        /* DataEvt type; published by lwipmgr if a udp packet has been received */
    TERMINATE_SIG,          /* published by BSP to terminate the application */
    MAX_PUB_SIG,                                /* the last published signal */
 
-   HUNGRY_SIG,          /* posted direclty to Table from hungry Philosopher */
+   DELIVER_ICE_CUBE_SIG,   /* Uint8Evt type; posted by mgtProtocolHandler directly to iceMgr if one or more ice cubes shall be delivered */
    SEND_UDP_SIG,
    MAX_SIG                                               /* the last signal */
 };
-
-typedef struct TableEvtTag {
-    QEvent super;                                    /* derives from QEvent */
-    uint8_t philoNum;                                 /* philosopher number */
-} TableEvt;
 
 #define MAX_TEXT_LEN 16
 typedef struct TextEvtTag {
@@ -62,13 +57,19 @@ typedef struct DataEvtTag {
   uint8_t data[MAX_DATA_LEN];
 } DataEvt;
 
-void Philo_ctor(void);
+typedef struct Uint8EvtTag {
+  QEvent super;
+  uint8_t data;   /* any type of event parameter fitting into one data byte */
+} Uint8Evt;
+
 void Table_ctor(void);
 void LwIPMgr_ctor(void);
 void MgtProtocolHandler_ctor(void);
+void IceMgr_ctor(void);
 
 extern QActive * const AO_Table;                /* "opaque" pointer  to Table AO */
 extern QActive * const AO_LwIPMgr;              /* "opaque" pointer  to LwIPMgr AO */
 extern QActive * const AO_MgtProtocolHandler;   /* "opaque" pointer  to MgtProtocolHandler AO */
+extern QActive * const AO_IceMgr;               /* "opaque" pointer  to IceMgr AO */
 
-#endif                                                             /* dpp_h */
+#endif

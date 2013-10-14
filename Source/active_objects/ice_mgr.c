@@ -3,9 +3,10 @@
                               All Rights Reserved
  ****************************************************************************************
 
-  DESCRIPTION:        This module implements the management protocol. This protocol is
-                      used to communicate between the Management Component (Multicore)
-                      and the microcontroller part.
+  DESCRIPTION:        This module implements the ice manager.
+                      The ice manager controls the delivery of ice cubes. It switches
+                      the ice cube delivery on and off, considering the number of ice
+                      cubes that pass the ice cube sensor.
 
  ****************************************************************************************
 
@@ -33,10 +34,10 @@
  Structs and typedefs
 *****************************************************************************************/
 /* Active object class -----------------------------------------------------*/
-typedef struct MgtProtocolHandlerTag {
+typedef struct IceMgrTag {
     QActive super;
     uint8_t aoExampleData;   /* not used; define specific AO data here */
-} MgtProtocolHandler;
+} IceMgr;
 
 
 /****************************************************************************************
@@ -47,8 +48,8 @@ typedef struct MgtProtocolHandlerTag {
 /****************************************************************************************
  Forward declarations
 *****************************************************************************************/
-static QState MgtProtocolHandler_initial(MgtProtocolHandler *me, QEvent const *e);
-static QState MgtProtocolHandler_running(MgtProtocolHandler *me, QEvent const *e);
+static QState IceMgr_initial(IceMgr *me, QEvent const *e);
+static QState IceMgr_running(IceMgr *me, QEvent const *e);
 
 
 /****************************************************************************************
@@ -57,20 +58,20 @@ static QState MgtProtocolHandler_running(MgtProtocolHandler *me, QEvent const *e
 Q_DEFINE_THIS_FILE
 
 /* Local objects -----------------------------------------------------------*/
-static MgtProtocolHandler l_mgtProtocolHandler;     /* the single instance of the mgtProtocolHandler active object */
+static IceMgr l_iceMgr;     /* the single instance of the iceMgr active object */
 
 /* Global-scope objects ----------------------------------------------------*/
-QActive * const AO_MgtProtocolHandler = (QActive *)&l_mgtProtocolHandler;      /* "opaque" AO pointer */
+QActive * const AO_IceMgr = (QActive *)&l_iceMgr;      /* "opaque" AO pointer */
 
 
 /****************************************************************************************
  Public function implementations
 *****************************************************************************************/
 /*..........................................................................*/
-void MgtProtocolHandler_ctor(void) {
-    MgtProtocolHandler *me = &l_mgtProtocolHandler;
+void IceMgr_ctor(void) {
+    IceMgr *me = &l_iceMgr;
 
-    QActive_ctor(&me->super, (QStateHandler)&MgtProtocolHandler_initial);
+    QActive_ctor(&me->super, (QStateHandler)&IceMgr_initial);
 
     me->aoExampleData = 0;
 }
@@ -80,40 +81,35 @@ void MgtProtocolHandler_ctor(void) {
  Private function implementations
 *****************************************************************************************/
 /*..........................................................................*/
-QState MgtProtocolHandler_initial(MgtProtocolHandler *me, QEvent const *e) {
+QState IceMgr_initial(IceMgr *me, QEvent const *e) {
     (void)e;        /* suppress the compiler warning about unused parameter */
 
-    QActive_subscribe((QActive *)me, PROCESS_UDP_SIG);
     QActive_subscribe((QActive *)me, TERMINATE_SIG);
 
-    QS_OBJ_DICTIONARY(&l_mgtProtocolHandler);
+    QS_OBJ_DICTIONARY(&l_iceMgr);
     QS_FUN_DICTIONARY(&QHsm_top);
-    QS_FUN_DICTIONARY(&MgtProtocolHandler_initial);
-    QS_FUN_DICTIONARY(&MgtProtocolHandler_running);
+    QS_FUN_DICTIONARY(&IceMgr_initial);
+    QS_FUN_DICTIONARY(&IceMgr_running);
 
-    QS_SIG_DICTIONARY(PROCESS_UDP_SIG,     0);
+    QS_SIG_DICTIONARY(DELIVER_ICE_CUBE_SIG,     0);
     QS_SIG_DICTIONARY(TERMINATE_SIG,     0);
 
-    return Q_TRAN(&MgtProtocolHandler_running);
+    return Q_TRAN(&IceMgr_running);
 }
 /*..........................................................................*/
-QState MgtProtocolHandler_running(MgtProtocolHandler *me, QEvent const *e) {
+QState IceMgr_running(IceMgr *me, QEvent const *e) {
 
     switch (e->sig) {
         case TERMINATE_SIG: {
             QF_stop();
             return Q_HANDLED();
         }
-        case PROCESS_UDP_SIG: {
-            /* TODO: process the command received via UDP here */
-            Uint8Evt *ue;
-            ue = Q_NEW(Uint8Evt, DELIVER_ICE_CUBE_SIG);
-            ue->data = 5;  /* TODO: use number of ice cubes here */
-            QACTIVE_POST(AO_IceMgr, (QEvent *)ue, me);    /* post directly */
-
-            omxEval_led_toggle(LED_2);  /* for debugging purposes */
+        case DELIVER_ICE_CUBE_SIG: {
+            /* TODO: start ice cube delivery process here */
+            omxEval_led_toggle(LED_3);  /* for debugging purposes */
             return Q_HANDLED();
         }
     }
     return Q_SUPER(&QHsm_top);
 }
+

@@ -101,7 +101,6 @@ QState Table_initial(Table *me, QEvent const *e) {
 }
 /*..........................................................................*/
 QState Table_serving(Table *me, QEvent const *e) {
-    TableEvt *pe;
 
     switch (e->sig) {
 		    case TERMINATE_SIG: {

@@ -33,12 +33,13 @@
 static QEvent const *l_tableQueueSto[5];
 static QEvent const *l_lwIPMgrQueueSto[10];
 static QEvent const *l_mgtProtocolHandlerSto[10];
+static QEvent const *l_iceMgrSto[5];
 static QSubscrList   l_subscrSto[MAX_PUB_SIG];
 
 static union SmallEvents {
     void   *e0;                                       /* minimum event size */
     uint8_t e1[sizeof(QEvent)];
-    uint8_t e2[sizeof(TableEvt)];
+    uint8_t e2[sizeof(Uint8Evt)];
     /* ... other event types to go into this pool */
 } l_smlPoolSto[20];                     /* storage for the small event pool */
 
@@ -52,9 +53,10 @@ static union MediumEvents {
 /*..........................................................................*/
 int main(void) {
 
-    Table_ctor();                    /* instantiate the Table active object */
-    LwIPMgr_ctor();           /* instantiate all LwIP-Manager active object */
+    Table_ctor();               /* instantiate the Table active object */
+    LwIPMgr_ctor();             /* instantiate all LwIP-Manager active object */
     MgtProtocolHandler_ctor();  /* instantiate the MgtProtocolHandler active object */
+    IceMgr_ctor();              /* instantiate the IceMgr active object */
 
     BSP_init();                     /* initialize the Board Support Package */
 
@@ -66,10 +68,11 @@ int main(void) {
     QS_OBJ_DICTIONARY(l_lwIPMgrQueueSto);
     QS_OBJ_DICTIONARY(l_tableQueueSto);
     QS_OBJ_DICTIONARY(l_mgtProtocolHandlerSto);
+    QS_OBJ_DICTIONARY(l_iceMgrSto);
 
     QF_psInit(l_subscrSto, Q_DIM(l_subscrSto));   /* init publish-subscribe */
 
-                                               /* initialize event pools... */
+    /* initialize event pools... */
     QF_poolInit(l_smlPoolSto, sizeof(l_smlPoolSto), sizeof(l_smlPoolSto[0]));
     QF_poolInit(l_medPoolSto, sizeof(l_medPoolSto), sizeof(l_medPoolSto[0]));
 
@@ -83,6 +86,10 @@ int main(void) {
 
     QActive_start(AO_MgtProtocolHandler, 5,
                   l_mgtProtocolHandlerSto, Q_DIM(l_mgtProtocolHandlerSto),
+                  (void *)0, 0, (QEvent *)0);
+
+    QActive_start(AO_IceMgr, 7,
+                  l_iceMgrSto, Q_DIM(l_iceMgrSto),
                   (void *)0, 0, (QEvent *)0);
 
     QF_run();                                     /* run the QF application */
