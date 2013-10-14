@@ -28,12 +28,14 @@
 #include "qp_port.h"
 #include "active_objects/ao_def.h"
 #include "bsp.h"
+#include "active_objects/ao_def.h"
 
 /* Local-scope objects -----------------------------------------------------*/
 static QEvent const *l_tableQueueSto[5];
 static QEvent const *l_lwIPMgrQueueSto[10];
 static QEvent const *l_mgtProtocolHandlerSto[10];
 static QEvent const *l_iceMgrSto[5];
+static QEvent const *l_modIo2MgrSto[5];
 static QSubscrList   l_subscrSto[MAX_PUB_SIG];
 
 static union SmallEvents {
@@ -57,6 +59,7 @@ int main(void) {
     LwIPMgr_ctor();             /* instantiate all LwIP-Manager active object */
     MgtProtocolHandler_ctor();  /* instantiate the MgtProtocolHandler active object */
     IceMgr_ctor();              /* instantiate the IceMgr active object */
+    ModIo2Mgr_ctor();           /* instantiate the ModIo2Mgr active object */
 
     BSP_init();                     /* initialize the Board Support Package */
 
@@ -69,6 +72,7 @@ int main(void) {
     QS_OBJ_DICTIONARY(l_tableQueueSto);
     QS_OBJ_DICTIONARY(l_mgtProtocolHandlerSto);
     QS_OBJ_DICTIONARY(l_iceMgrSto);
+    QS_OBJ_DICTIONARY(l_modIo2MgrSto);
 
     QF_psInit(l_subscrSto, Q_DIM(l_subscrSto));   /* init publish-subscribe */
 
@@ -90,6 +94,10 @@ int main(void) {
 
     QActive_start(AO_IceMgr, 7,
                   l_iceMgrSto, Q_DIM(l_iceMgrSto),
+                  (void *)0, 0, (QEvent *)0);
+
+    QActive_start(AO_ModIo2Mgr, 9,
+                  l_modIo2MgrSto, Q_DIM(l_modIo2MgrSto),
                   (void *)0, 0, (QEvent *)0);
 
     QF_run();                                     /* run the QF application */

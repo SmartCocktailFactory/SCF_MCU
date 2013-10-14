@@ -3,9 +3,9 @@
                               All Rights Reserved
  ****************************************************************************************
 
-  DESCRIPTION:        This module implements the management protocol. This protocol is
-                      used to communicate between the Management Component (Multicore)
-                      and the microcontroller part.
+  DESCRIPTION:        This module implements the MOD-IO2 manager.
+                      It manages all accesses to the MOD-IO2 extension module
+                      (containing relays and GPIO).
 
  ****************************************************************************************
 
@@ -33,10 +33,10 @@
  Structs and typedefs
 *****************************************************************************************/
 /* Active object class -----------------------------------------------------*/
-typedef struct MgtProtocolHandlerTag {
+typedef struct ModIo2MgrTag {
     QActive super;
     uint8_t aoExampleData;   /* not used; define specific AO data here */
-} MgtProtocolHandler;
+} ModIo2Mgr;
 
 
 /****************************************************************************************
@@ -47,8 +47,8 @@ typedef struct MgtProtocolHandlerTag {
 /****************************************************************************************
  Forward declarations
 *****************************************************************************************/
-static QState MgtProtocolHandler_initial(MgtProtocolHandler *me, QEvent const *e);
-static QState MgtProtocolHandler_running(MgtProtocolHandler *me, QEvent const *e);
+static QState ModIo2Mgr_initial(ModIo2Mgr *me, QEvent const *e);
+static QState ModIo2Mgr_running(ModIo2Mgr *me, QEvent const *e);
 
 
 /****************************************************************************************
@@ -57,20 +57,20 @@ static QState MgtProtocolHandler_running(MgtProtocolHandler *me, QEvent const *e
 Q_DEFINE_THIS_FILE
 
 /* Local objects -----------------------------------------------------------*/
-static MgtProtocolHandler l_mgtProtocolHandler;     /* the single instance of the mgtProtocolHandler active object */
+static ModIo2Mgr l_modIo2Mgr;     /* the single instance of the modIo2Mgr active object */
 
 /* Global-scope objects ----------------------------------------------------*/
-QActive * const AO_MgtProtocolHandler = (QActive *)&l_mgtProtocolHandler;      /* "opaque" AO pointer */
+QActive * const AO_ModIo2Mgr = (QActive *)&l_modIo2Mgr;      /* "opaque" AO pointer */
 
 
 /****************************************************************************************
  Public function implementations
 *****************************************************************************************/
 /*..........................................................................*/
-void MgtProtocolHandler_ctor(void) {
-    MgtProtocolHandler *me = &l_mgtProtocolHandler;
+void ModIo2Mgr_ctor(void) {
+    ModIo2Mgr *me = &l_modIo2Mgr;
 
-    QActive_ctor(&me->super, (QStateHandler)&MgtProtocolHandler_initial);
+    QActive_ctor(&me->super, (QStateHandler)&ModIo2Mgr_initial);
 
     me->aoExampleData = 0;
 }
@@ -80,38 +80,40 @@ void MgtProtocolHandler_ctor(void) {
  Private function implementations
 *****************************************************************************************/
 /*..........................................................................*/
-static QState MgtProtocolHandler_initial(MgtProtocolHandler *me, QEvent const *e) {
+static QState ModIo2Mgr_initial(ModIo2Mgr *me, QEvent const *e) {
     (void)e;        /* suppress the compiler warning about unused parameter */
 
-    QActive_subscribe((QActive *)me, PROCESS_UDP_SIG);
+    QActive_subscribe((QActive *)me, ENABLE_RELAY_SIG);
+    QActive_subscribe((QActive *)me, DISABLE_RELAY_SIG);
     QActive_subscribe((QActive *)me, TERMINATE_SIG);
 
-    QS_OBJ_DICTIONARY(&l_mgtProtocolHandler);
+    QS_OBJ_DICTIONARY(&l_modIo2Mgr);
     QS_FUN_DICTIONARY(&QHsm_top);
-    QS_FUN_DICTIONARY(&MgtProtocolHandler_initial);
-    QS_FUN_DICTIONARY(&MgtProtocolHandler_running);
+    QS_FUN_DICTIONARY(&ModIo2Mgr_initial);
+    QS_FUN_DICTIONARY(&ModIo2Mgr_running);
 
-    QS_SIG_DICTIONARY(PROCESS_UDP_SIG,     0);
+    QS_SIG_DICTIONARY(ENABLE_RELAY_SIG,  0);
+    QS_SIG_DICTIONARY(DISABLE_RELAY_SIG, 0);
     QS_SIG_DICTIONARY(TERMINATE_SIG,     0);
 
-    return Q_TRAN(&MgtProtocolHandler_running);
+    return Q_TRAN(&ModIo2Mgr_running);
 }
 /*..........................................................................*/
-static QState MgtProtocolHandler_running(MgtProtocolHandler *me, QEvent const *e) {
+static QState ModIo2Mgr_running(ModIo2Mgr *me, QEvent const *e) {
 
     switch (e->sig) {
         case TERMINATE_SIG: {
             QF_stop();
             return Q_HANDLED();
         }
-        case PROCESS_UDP_SIG: {
-            /* TODO: process the command received via UDP here */
-            Uint8Evt *ue;
-            ue = Q_NEW(Uint8Evt, DELIVER_ICE_CUBE_SIG);
-            ue->data = 5;  /* TODO: use number of ice cubes here */
-            QACTIVE_POST(AO_IceMgr, (QEvent *)ue, me);    /* post directly */
-
-            omxEval_led_toggle(LED_2);  /* for debugging purposes */
+        case ENABLE_RELAY_SIG: {
+            /* TODO: enable the relay here, relay number can be obtained from event data */
+            omxEval_led_toggle(LED_4);  /* for debugging purposes */
+            return Q_HANDLED();
+        }
+        case DISABLE_RELAY_SIG: {
+            /* TODO: disable the relay here, relay number can be obtained from event data */
+            omxEval_led_toggle(LED_4);  /* for debugging purposes */
             return Q_HANDLED();
         }
     }

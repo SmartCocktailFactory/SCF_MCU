@@ -81,7 +81,7 @@ void IceMgr_ctor(void) {
  Private function implementations
 *****************************************************************************************/
 /*..........................................................................*/
-QState IceMgr_initial(IceMgr *me, QEvent const *e) {
+static QState IceMgr_initial(IceMgr *me, QEvent const *e) {
     (void)e;        /* suppress the compiler warning about unused parameter */
 
     QActive_subscribe((QActive *)me, TERMINATE_SIG);
@@ -97,7 +97,7 @@ QState IceMgr_initial(IceMgr *me, QEvent const *e) {
     return Q_TRAN(&IceMgr_running);
 }
 /*..........................................................................*/
-QState IceMgr_running(IceMgr *me, QEvent const *e) {
+static QState IceMgr_running(IceMgr *me, QEvent const *e) {
 
     switch (e->sig) {
         case TERMINATE_SIG: {
@@ -106,6 +106,11 @@ QState IceMgr_running(IceMgr *me, QEvent const *e) {
         }
         case DELIVER_ICE_CUBE_SIG: {
             /* TODO: start ice cube delivery process here */
+            Uint8Evt *ue;
+            ue = Q_NEW(Uint8Evt, ENABLE_RELAY_SIG);
+            ue->data = 1;  /* TODO: use correct relay number here */
+            QF_PUBLISH((QEvent *)ue, me);
+
             omxEval_led_toggle(LED_3);  /* for debugging purposes */
             return Q_HANDLED();
         }
