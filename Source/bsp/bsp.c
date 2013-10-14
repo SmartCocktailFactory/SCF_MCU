@@ -38,7 +38,7 @@
 #include <omx_p207_eval/lcd/lcd.h>
 #include <omx_p207_eval/rs232/rs232.h>
 #include "qp_port.h"
-#include "dpp.h"
+#include "active_objects/ao_def.h"
 #include "bsp.h"
 #include "eth_driver.h"
 #include "stm32f2x7_eth_bsp.h"

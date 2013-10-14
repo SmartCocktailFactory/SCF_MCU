@@ -28,7 +28,7 @@
 #define LWIP_ALLOWED
 
 #include "qp_port.h"                                             /* QP-port */
-#include "dpp.h"                   /* application events and active objects */
+#include "active_objects/ao_def.h"                   /* application events and active objects */
 #include "bsp.h"                                   /* Board Support Package */
 
 #include "lwip.h"                                             /* lwIP stack */
@@ -332,6 +332,10 @@ static void udp_rx_handler(void *arg, struct udp_pcb *upcb,
     TextEvt *te = Q_NEW(TextEvt, DISPLAY_UDP_SIG);
     strncpy(te->text, (char *)p->payload, Q_DIM(te->text));
     QF_PUBLISH((QEvent *)te, AO_LwIPMgr);
+
+    DataEvt *de = Q_NEW(DataEvt, PROCESS_UDP_SIG);
+    memcpy(de->data, (char *)p->payload, Q_DIM(de->data));
+    QF_PUBLISH((QEvent *)de, AO_LwIPMgr);
 
     udp_connect(upcb, addr, port);            /* connect to the remote host */
     pbuf_free(p);                                   /* don't leak the pbuf! */

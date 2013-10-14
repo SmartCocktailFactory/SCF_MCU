@@ -25,8 +25,8 @@
 * Quantum Leaps Web site:  http://www.quantum-leaps.com
 * e-mail:                  info@quantum-leaps.com
 *****************************************************************************/
-#ifndef dpp_h
-#define dpp_h
+#ifndef ao_def_h
+#define ao_def_h
 
 #include "qf.h"
 
@@ -36,6 +36,7 @@ enum DPPSignals {
    DISPLAY_IPADDR_SIG,
    DISPLAY_CGI_SIG,
    DISPLAY_UDP_SIG,
+   PROCESS_UDP_SIG,        /* published by lwipmgr if a udp packet has been received */
    TERMINATE_SIG,          /* published by BSP to terminate the application */
    MAX_PUB_SIG,                                /* the last published signal */
 
@@ -55,14 +56,19 @@ typedef struct TextEvtTag {
 	char text[MAX_TEXT_LEN];
 } TextEvt;
 
-enum { N_PHILO = 5 };                             /* number of philosophers */
+#define MAX_DATA_LEN 16
+typedef struct DataEvtTag {
+  QEvent super;
+  uint8_t data[MAX_DATA_LEN];
+} DataEvt;
 
 void Philo_ctor(void);
 void Table_ctor(void);
 void LwIPMgr_ctor(void);
+void MgtProtocolHandler_ctor(void);
 
-extern QActive * const AO_Philo[N_PHILO]; /* "opaque" pointers to Philo AO */
-extern QActive * const AO_Table;          /* "opaque" pointer  to Table AO */
-extern QActive * const AO_LwIPMgr;        /* "opaque" pointer  to LwIPMgr AO */
+extern QActive * const AO_Table;                /* "opaque" pointer  to Table AO */
+extern QActive * const AO_LwIPMgr;              /* "opaque" pointer  to LwIPMgr AO */
+extern QActive * const AO_MgtProtocolHandler;   /* "opaque" pointer  to MgtProtocolHandler AO */
 
 #endif                                                             /* dpp_h */

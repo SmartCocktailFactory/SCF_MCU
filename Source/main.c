@@ -26,12 +26,13 @@
 * e-mail:                  info@quantum-leaps.com
 *****************************************************************************/
 #include "qp_port.h"
-#include "dpp.h"
+#include "active_objects/ao_def.h"
 #include "bsp.h"
 
 /* Local-scope objects -----------------------------------------------------*/
-static QEvent const *l_tableQueueSto[N_PHILO];
+static QEvent const *l_tableQueueSto[5];
 static QEvent const *l_lwIPMgrQueueSto[10];
+static QEvent const *l_mgtProtocolHandlerSto[10];
 static QSubscrList   l_subscrSto[MAX_PUB_SIG];
 
 static union SmallEvents {
@@ -44,14 +45,17 @@ static union SmallEvents {
 static union MediumEvents {
     void   *e0;                                       /* minimum event size */
     uint8_t e1[sizeof(TextEvt)];
+    uint8_t e2[sizeof(DataEvt)];
     /* ... other event types to go into this pool */
-} l_medPoolSto[4];                     /* storage for the medium event pool */
+} l_medPoolSto[10];                     /* storage for the medium event pool */
 
 /*..........................................................................*/
 int main(void) {
 
     Table_ctor();                    /* instantiate the Table active object */
     LwIPMgr_ctor();           /* instantiate all LwIP-Manager active object */
+    MgtProtocolHandler_ctor();  /* instantiate the MgtProtocolHandler active object */
+
     BSP_init();                     /* initialize the Board Support Package */
 
     QF_init();     /* initialize the framework and the underlying RT kernel */
@@ -61,6 +65,7 @@ int main(void) {
     QS_OBJ_DICTIONARY(l_medPoolSto);
     QS_OBJ_DICTIONARY(l_lwIPMgrQueueSto);
     QS_OBJ_DICTIONARY(l_tableQueueSto);
+    QS_OBJ_DICTIONARY(l_mgtProtocolHandlerSto);
 
     QF_psInit(l_subscrSto, Q_DIM(l_subscrSto));   /* init publish-subscribe */
 
@@ -72,8 +77,12 @@ int main(void) {
                   l_lwIPMgrQueueSto, Q_DIM(l_lwIPMgrQueueSto),
                   (void *)0, 0, (QEvent *)0);
 
-    QActive_start(AO_Table, (uint8_t)(N_PHILO + 2),
+    QActive_start(AO_Table, 3,
                   l_tableQueueSto, Q_DIM(l_tableQueueSto),
+                  (void *)0, 0, (QEvent *)0);
+
+    QActive_start(AO_MgtProtocolHandler, 5,
+                  l_mgtProtocolHandlerSto, Q_DIM(l_mgtProtocolHandlerSto),
                   (void *)0, 0, (QEvent *)0);
 
     QF_run();                                     /* run the QF application */

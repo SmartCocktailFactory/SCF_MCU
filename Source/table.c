@@ -26,11 +26,10 @@
 * e-mail:                  info@quantum-leaps.com
 *****************************************************************************/
 #include "qp_port.h"                                 /* QP port header file */
-#include "dpp.h"                   /* application events and active objects */
+#include "active_objects/ao_def.h"     /* application events and active objects */
 #include "bsp.h"                       /* Board Support Package header file */
-//#include "stm32_eval.h"
 #include <stdio.h>
-#include <omx_p207_eval/lcd/lcd.h>
+#include "omx_p207_eval/lcd/lcd.h"
 
 
 Q_DEFINE_THIS_FILE
@@ -45,7 +44,6 @@ static QState Table_initial(Table *me, QEvent const *e);
 static QState Table_serving(Table *me, QEvent const *e);
 
 static void Table_displayInit(Table *me);
-static void Table_displayPhilStat(Table *me, uint8_t n, char const *stat);
 static void Table_displayIPAddr(Table *me, char const *ip_addr);
 static void Table_displayUdpText(Table *me, char const *text);
 static void Table_displayCgiText(Table *me, char const *text);
@@ -67,7 +65,6 @@ QActive * const AO_Table = (QActive *)&l_table;      /* "opaque" AO pointer */
 
 /*..........................................................................*/
 void Table_ctor(void) {
-    uint8_t n;
     Table *me = &l_table;
 
     QActive_ctor(&me->super, (QStateHandler)&Table_initial);
@@ -95,7 +92,7 @@ QState Table_initial(Table *me, QEvent const *e) {
     QS_SIG_DICTIONARY(DISPLAY_CGI_SIG,     0);
     QS_SIG_DICTIONARY(DISPLAY_UDP_SIG,     0);
 
-	QS_SIG_DICTIONARY(TERMINATE_SIG, 	   0);
+	  QS_SIG_DICTIONARY(TERMINATE_SIG, 	   0);
 
 
     QActive_subscribe((QActive *)me, TERMINATE_SIG);
@@ -104,11 +101,10 @@ QState Table_initial(Table *me, QEvent const *e) {
 }
 /*..........................................................................*/
 QState Table_serving(Table *me, QEvent const *e) {
-    uint8_t n, m;
     TableEvt *pe;
 
     switch (e->sig) {
-		case TERMINATE_SIG: {
+		    case TERMINATE_SIG: {
             QF_stop();
             return Q_HANDLED();
         }
