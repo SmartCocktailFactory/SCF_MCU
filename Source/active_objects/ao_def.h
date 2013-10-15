@@ -1,36 +1,18 @@
-/*****************************************************************************
-* Product: DPP example
-* Last Updated for Version: 4.0.00
-* Date of the Last Update:  Apr 07, 2008
-*
-*                    Q u a n t u m     L e a P s
-*                    ---------------------------
-*                    innovating embedded systems
-*
-* Copyright (C) 2002-2008 Quantum Leaps, LLC. All rights reserved.
-*
-* This software may be distributed and modified under the terms of the GNU
-* General Public License version 2 (GPL) as published by the Free Software
-* Foundation and appearing in the file GPL.TXT included in the packaging of
-* this file. Please note that GPL Section 2[b] requires that all works based
-* on this software must also be made publicly available under the terms of
-* the GPL ("Copyleft").
-*
-* Alternatively, this software may be distributed and modified under the
-* terms of Quantum Leaps commercial licenses, which expressly supersede
-* the GPL and are specifically designed for licensees interested in
-* retaining the proprietary status of their code.
-*
-* Contact information:
-* Quantum Leaps Web site:  http://www.quantum-leaps.com
-* e-mail:                  info@quantum-leaps.com
-*****************************************************************************/
+/****************************************************************************************
+                         Copyright (C) Zuehlke Engineering
+                              All Rights Reserved
+ ****************************************************************************************
+
+  DESCRIPTION:        This header file defines all user signals and events and declares
+                      all active objects.
+
+ ****************************************************************************************/
 #ifndef ao_def_h
 #define ao_def_h
 
 #include "qf.h"
 
-enum DPPSignals {
+enum ScfSignals {
    EAT_SIG = Q_USER_SIG,     /* published by Table to let a philosopher eat */
    DONE_SIG,                   /* published by Philosopher when done eating */
    DISPLAY_IPADDR_SIG,
@@ -53,10 +35,11 @@ typedef struct TextEvtTag {
 	char text[MAX_TEXT_LEN];
 } TextEvt;
 
-#define MAX_DATA_LEN 16
+#define DATA_EVT_BUFFER_SIZE 32
 typedef struct DataEvtTag {
   QEvent super;
-  uint8_t data[MAX_DATA_LEN];
+  uint8_t dataBuffer[DATA_EVT_BUFFER_SIZE];  /* data buffer */
+  uint32_t usedDataBufferLength;     /* the number of bytes in the data buffer that are actually used */
 } DataEvt;
 
 typedef struct Uint8EvtTag {

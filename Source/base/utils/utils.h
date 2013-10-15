@@ -3,7 +3,7 @@
                               All Rights Reserved
  ****************************************************************************************
 
-  DESCRIPTION:        Utility functions for Olimex P207 eval board.
+  DESCRIPTION:        Utility functions for various tasks.
 
 
  ****************************************************************************************
@@ -56,5 +56,36 @@ void delayUs(uint32_t delayInMicroseconds);
  */
 void delayMs(uint32_t delayInMilliseconds);
 
+/**
+ * Convert a 32 bit value from host byte order to network byte order.
+ *
+ * @param hostlong the value to be converted
+ * @return the converted value
+ */
+uint32_t htonl(uint32_t hostlong);
+
+/**
+ * Convert a 16 bit value from host byte order to network byte order.
+ *
+ * @param hostshort the value to be converted
+ * @return the converted value
+ */
+uint16_t htons(uint16_t hostshort);
+
+/**
+ * Convert a 32 bit value from network byte order to host byte order.
+ *
+ * @param netlong the value to be converted
+ * @return the converted value
+ */
+uint32_t ntohl(uint32_t netlong);
+
+/**
+ * Convert a 16 bit value from network byte order to host byte order.
+ *
+ * @param netshort the value to be converted
+ * @return the converted value
+ */
+uint16_t ntohs(uint16_t netshort);
 
 #endif

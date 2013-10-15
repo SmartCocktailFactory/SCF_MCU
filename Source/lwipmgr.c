@@ -334,7 +334,14 @@ static void udp_rx_handler(void *arg, struct udp_pcb *upcb,
     QF_PUBLISH((QEvent *)te, AO_LwIPMgr);
 
     DataEvt *de = Q_NEW(DataEvt, PROCESS_UDP_SIG);
-    memcpy(de->data, (char *)p->payload, Q_DIM(de->data));
+    uint32_t usedBufferLength = 0u;
+    if (p->len < DATA_EVT_BUFFER_SIZE) {
+      usedBufferLength = p->len;
+    } else {
+      usedBufferLength = DATA_EVT_BUFFER_SIZE;
+    }
+    memcpy(de->dataBuffer, (char *)p->payload, usedBufferLength);
+    de->usedDataBufferLength = usedBufferLength;
     QF_PUBLISH((QEvent *)de, AO_LwIPMgr);
 
     udp_connect(upcb, addr, port);            /* connect to the remote host */
