@@ -16,6 +16,9 @@ typedef enum {
   Success = !Error  /**< The command succeeded. */
 } Status;
 
+/** Initialize the MODIO2 board. */
+Status ModIO2_init();
+
 /** Enable the first relay. */
 Status ModIO2_enableRelay1();
 

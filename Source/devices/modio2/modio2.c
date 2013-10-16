@@ -25,6 +25,13 @@ Status Write_RelayState() {
   return (omsEval_i2c_write(MODIO2_SLAVE_ADDRESS, sizeof(buf), buf) != ERROR) ? Success : Error;
 }
 
+
+Status ModIO2_init()
+{
+  relayState = 0x00U;
+  return Write_RelayState();
+}
+
 Status ModIO2_enableRelay1() {
   relayState |= 0x01;
   return Write_RelayState();

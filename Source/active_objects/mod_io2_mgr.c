@@ -17,6 +17,7 @@
 #include "bsp.h"                       /* Board Support Package header file */
 #include <stdio.h>
 #include "omx_p207_eval/led/led.h"
+#include "omx_p207_eval/lcd/lcd.h"
 #include "devices/modio2/modio2.h"
 
 
@@ -99,7 +100,16 @@ static QState ModIo2Mgr_initial(ModIo2Mgr *me, QEvent const *e) {
     QS_SIG_DICTIONARY(DISABLE_RELAY_SIG, 0);
     QS_SIG_DICTIONARY(TERMINATE_SIG,     0);
 
-    return Q_TRAN(&ModIo2Mgr_running);
+    if (ModIO2_init() == Error)
+    {
+      omxEval_led_on(LED_1);
+      LCDPutStr("Err MODIO2 init", 110, 5, LARGE, RED, WHITE);
+      return Q_UNHANDLED();
+    }
+    else
+    {
+      return Q_TRAN(&ModIo2Mgr_running);
+    }
 }
 /*..........................................................................*/
 static QState ModIo2Mgr_running(ModIo2Mgr *me, QEvent const *e) {
