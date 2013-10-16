@@ -118,6 +118,14 @@ static QState MgtProtocolHandler_running(MgtProtocolHandler *me, QEvent const *e
             omxEval_led_toggle(LED_2);  /* for debugging purposes */
             return Q_HANDLED();
         }
+        case ICE_CUBE_DELIVERY_DONE_SIG: {
+            // TODO: return delivery done
+            return Q_HANDLED();
+        }
+        case ICE_CUBE_DELIVERY_TMO_SIG: {
+            // TODO: return delivery failure
+            return Q_HANDLED();
+        }
     }
     return Q_SUPER(&QHsm_top);
 }

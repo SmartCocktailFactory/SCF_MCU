@@ -26,6 +26,8 @@ enum ScfSignals {
    MAX_PUB_SIG,                                /* the last published signal */
 
    DELIVER_ICE_CUBE_SIG,   /* Uint8Evt type; posted by mgtProtocolHandler directly to iceMgr if one or more ice cubes shall be delivered */
+   ICE_CUBE_DELIVERY_DONE_SIG,
+   ICE_CUBE_DELIVERY_TMO_SIG,
    SEND_UDP_SIG,
    MAX_SIG                                               /* the last signal */
 };

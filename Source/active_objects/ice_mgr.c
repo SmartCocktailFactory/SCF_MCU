@@ -163,13 +163,13 @@ static QState IceMgr_delivering(IceMgr *me, QEvent const *e) {
               return Q_HANDLED();
           }
           else {
-              // TODO: signal ice cubes delivered
+              QACTIVE_POST(AO_MgtProtocolHandler, Q_NEW(QEvent, ICE_CUBE_DELIVERY_DONE_SIG), me);
               return Q_TRAN(&IceMgr_stopped);
           }
       }
       case TIMEOUT_SIG: {
           me->numberOfIceCubes = 0u;
-          // TODO: signal ice cube delivery error
+          QACTIVE_POST(AO_MgtProtocolHandler, Q_NEW(QEvent, ICE_CUBE_DELIVERY_TMO_SIG), me);
           return Q_TRAN(&IceMgr_stopped);
       }
   }
