@@ -1,18 +1,25 @@
-/*
- * modio2.c
- *
- *  Created on: Oct 14, 2013
- *      Author: Daniel Steiner
- */
+/****************************************************************************************
+                         Copyright (C) Zuehlke Engineering
+                              All Rights Reserved
+ ****************************************************************************************
+
+  DESCRIPTION:        Interface of the MODIO2 extension board device.
+
+ ****************************************************************************************/
 
 #include "modio2.h"
 #include <omx_p207_eval/i2c/i2c.h>
 
-#define MODIO2_SLAVE_ADDRESS 0x21U
+/** The I2C slave address of MODIO2. */
+#define MODIO2_SLAVE_ADDRESS 0x42U
+
+/** Command: Set relay. */
 #define MODIO2_COMMAND_SET_RELAY 0x40U
 
+/** The current relay state. */
 static uint8_t relayState = 0x00U;
 
+/** Sends the relay state to MODIO2. */
 Status Write_RelayState() {
   const uint8_t buf[] = { MODIO2_COMMAND_SET_RELAY, relayState };
   return (omsEval_i2c_write(MODIO2_SLAVE_ADDRESS, sizeof(buf), buf) != ERROR) ? Success : Error;
