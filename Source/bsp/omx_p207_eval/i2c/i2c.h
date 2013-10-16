@@ -1,9 +1,11 @@
-/*
- * i2c.h
- *
- *  Created on: Oct 04, 2013
- *      Author: Daniel Steiner
- */
+/****************************************************************************************
+                         Copyright (C) Zuehlke Engineering
+                              All Rights Reserved
+ ****************************************************************************************
+
+  DESCRIPTION:        Header of the I2C driver.
+
+ ****************************************************************************************/
 
 #ifndef I2C_H_
 #define I2C_H_
@@ -12,7 +14,7 @@
 #include <stddef.h>
 
 /**
- * Initialize the I2C ports on the Olimex eval board.
+ * Initialize the I2C port on the Olimex eval board.
  */
 void omxEval_i2c_init();
 
