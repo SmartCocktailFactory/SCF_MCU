@@ -17,6 +17,7 @@
 #include "bsp.h"                       /* Board Support Package header file */
 #include <stdio.h>
 #include "omx_p207_eval/led/led.h"
+#include "devices/modio2/modio2.h"
 
 
 /****************************************************************************************
@@ -49,6 +50,7 @@ typedef struct ModIo2MgrTag {
 *****************************************************************************************/
 static QState ModIo2Mgr_initial(ModIo2Mgr *me, QEvent const *e);
 static QState ModIo2Mgr_running(ModIo2Mgr *me, QEvent const *e);
+static void modIo2Mgr_enableRelay(uint8_t relayNumber);
 
 
 /****************************************************************************************
@@ -107,15 +109,30 @@ static QState ModIo2Mgr_running(ModIo2Mgr *me, QEvent const *e) {
             return Q_HANDLED();
         }
         case ENABLE_RELAY_SIG: {
-            /* TODO: enable the relay here, relay number can be obtained from event data */
-            omxEval_led_toggle(LED_4);  /* for debugging purposes */
+            modIo2Mgr_enableRelay(((Uint8Evt*)e)->data);
+            omxEval_led_on(LED_4);  /* for debugging purposes */
             return Q_HANDLED();
         }
         case DISABLE_RELAY_SIG: {
             /* TODO: disable the relay here, relay number can be obtained from event data */
-            omxEval_led_toggle(LED_4);  /* for debugging purposes */
+            omxEval_led_off(LED_4);  /* for debugging purposes */
             return Q_HANDLED();
         }
     }
     return Q_SUPER(&QHsm_top);
+}
+
+
+static void modIo2Mgr_enableRelay(uint8_t relayNumber)
+{
+  switch (relayNumber) {
+  case 1u:
+    ModIO2_enableRelay1();
+    break;
+  case 2u:
+    ModIO2_enableRelay2();
+    break;
+  default:
+    break;
+  }
 }

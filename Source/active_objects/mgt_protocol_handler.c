@@ -17,6 +17,7 @@
 #include "bsp.h"                       /* Board Support Package header file */
 #include <stdio.h>
 #include "omx_p207_eval/led/led.h"
+#include "omx_p207_eval/lcd/lcd.h"
 #include "base/utils/utils.h"
 
 
@@ -26,6 +27,8 @@
 #define MGT_PROTOCOL_CMD_NUMBER_SIZE   4u       /**< Size of command number field in frame */
 
 #define MGT_PROTOCOL_CMD_DELIVER_ICE_CUBE   0x03u    /**< Number of DeliverIceCube command */
+
+#define COMMAND_NUMBER_STRING_SIZE  11u
 
 /****************************************************************************************
  Enums
@@ -130,8 +133,12 @@ static void mgtProtocolHandler_processFrame(MgtProtocolHandler *me, const uint8_
 {
     Q_ASSERT(frameContent != (void*)0);
     Q_ASSERT(frameLength >= MGT_PROTOCOL_CMD_NUMBER_SIZE);
-
     uint32_t commandNumber = ntohl(*((uint32_t*)frameContent));
+
+    /* print command number to display */
+    char commandNumberString[COMMAND_NUMBER_STRING_SIZE];
+    snprintf(commandNumberString, sizeof(commandNumberString), "0x%x", (unsigned int) commandNumber);
+    LCDPutStr(commandNumberString, 80, 40, LARGE, RED, WHITE);
 
     switch (commandNumber) {
     case MGT_PROTOCOL_CMD_DELIVER_ICE_CUBE:

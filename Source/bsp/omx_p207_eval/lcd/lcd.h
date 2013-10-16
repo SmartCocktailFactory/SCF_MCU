@@ -130,8 +130,7 @@ void LCDSetLine(int x1, int y1, int x2, int y2, int color);
 void LCDSetRect(int x0, int y0, int x1, int y1, unsigned char fill, int color);
 void LCDSetCircle(int x0, int y0, int radius, int color);
 void LCDPutChar(char c, int x, int y, int size, int fcolor, int bcolor);
-void LCDPutString (char *lcd_string, const char *font_style, unsigned char x, unsigned char y,
-unsigned char fcolor, unsigned char bcolor);
+void LCDPutStr(char *pString, int x, int y, int Size, int fColor, int bColor);
 void TestLcd(void);
 
 
