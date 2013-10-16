@@ -35,7 +35,7 @@
 #ifndef bsp_h
 #define bsp_h
                                                 // System clock tick rate [Hz]
-#define BSP_TICKS_PER_SEC 10000u
+#define BSP_TICKS_PER_SEC 1000u
 
 void BSP_init(void);
 void BSP_busyDelay(void);             // to artificially extend RTC processing

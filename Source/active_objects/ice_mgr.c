@@ -23,7 +23,7 @@
 /****************************************************************************************
  Defines
 *****************************************************************************************/
-#define ICE_DELIVERY_TIME   (5u*BSP_TICKS_PER_SEC)   /* caution: must fit into uint16_t */
+#define ICE_DELIVERY_TIMEOUT   (30u*BSP_TICKS_PER_SEC)   /* caution: must fit into uint16_t */
 
 
 /****************************************************************************************
@@ -41,6 +41,7 @@ enum InternalSignals {                                  /* internal signals */
 typedef struct IceMgrTag {
     QActive super;
     QTimeEvt timeEvt;   /* timeout to stop ice cube delivery */
+    uint8_t numberOfIceCubes;
 } IceMgr;
 
 
@@ -77,6 +78,7 @@ void IceMgr_ctor(void) {
     IceMgr *me = &l_iceMgr;
     QActive_ctor(&me->super, (QStateHandler)&IceMgr_initial);
     QTimeEvt_ctor(&me->timeEvt, TIMEOUT_SIG);
+    me->numberOfIceCubes = 0u;
 }
 
 
@@ -112,7 +114,14 @@ static QState IceMgr_stopped(IceMgr *me, QEvent const *e) {
             return Q_HANDLED();
         }
         case DELIVER_ICE_CUBE_SIG: {
-            return Q_TRAN(&IceMgr_delivering);
+            Uint8Evt *ue = (Uint8Evt *)e;
+            if (ue->data > 0u) {
+                me->numberOfIceCubes = ue->data;
+                return Q_TRAN(&IceMgr_delivering);
+            }
+            else {
+                return Q_HANDLED();
+            }
         }
     }
     return Q_SUPER(&QHsm_top);
@@ -134,7 +143,7 @@ static QState IceMgr_delivering(IceMgr *me, QEvent const *e) {
           QF_PUBLISH((QEvent *)ue, me);
 
           /* start timeout */
-          QTimeEvt_postIn(&me->timeEvt, (QActive *)me, ICE_DELIVERY_TIME);
+          QTimeEvt_postIn(&me->timeEvt, (QActive *)me, ICE_DELIVERY_TIMEOUT);
           omxEval_led_on(LED_3);  /* for debugging purposes */
           return Q_HANDLED();
       }
@@ -148,8 +157,19 @@ static QState IceMgr_delivering(IceMgr *me, QEvent const *e) {
           omxEval_led_off(LED_3);  /* for debugging purposes */
           return Q_HANDLED();
       }
-      case ICE_CUBE_DETECTED_SIG:
+      case ICE_CUBE_DETECTED_SIG: {
+          me->numberOfIceCubes--;
+          if (me->numberOfIceCubes > 0u) {
+              return Q_HANDLED();
+          }
+          else {
+              // TODO: signal ice cubes delivered
+              return Q_TRAN(&IceMgr_stopped);
+          }
+      }
       case TIMEOUT_SIG: {
+          me->numberOfIceCubes = 0u;
+          // TODO: signal ice cube delivery error
           return Q_TRAN(&IceMgr_stopped);
       }
   }
