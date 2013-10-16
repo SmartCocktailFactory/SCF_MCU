@@ -23,11 +23,15 @@
 /****************************************************************************************
  Defines
 *****************************************************************************************/
+#define ICE_DELIVERY_TIME   (5u*BSP_TICKS_PER_SEC)   /* caution: must fit into uint16_t */
 
 
 /****************************************************************************************
  Enums
 *****************************************************************************************/
+enum InternalSignals {                                  /* internal signals */
+    TIMEOUT_SIG = MAX_SIG
+};
 
 
 /****************************************************************************************
@@ -36,7 +40,7 @@
 /* Active object class -----------------------------------------------------*/
 typedef struct IceMgrTag {
     QActive super;
-    uint8_t aoExampleData;   /* not used; define specific AO data here */
+    QTimeEvt timeEvt;   /* timeout to stop ice cube delivery */
 } IceMgr;
 
 
@@ -49,7 +53,8 @@ typedef struct IceMgrTag {
  Forward declarations
 *****************************************************************************************/
 static QState IceMgr_initial(IceMgr *me, QEvent const *e);
-static QState IceMgr_running(IceMgr *me, QEvent const *e);
+static QState IceMgr_stopped(IceMgr *me, QEvent const *e);
+static QState IceMgr_delivering(IceMgr *me, QEvent const *e);
 
 
 /****************************************************************************************
@@ -70,10 +75,8 @@ QActive * const AO_IceMgr = (QActive *)&l_iceMgr;      /* "opaque" AO pointer */
 /*..........................................................................*/
 void IceMgr_ctor(void) {
     IceMgr *me = &l_iceMgr;
-
     QActive_ctor(&me->super, (QStateHandler)&IceMgr_initial);
-
-    me->aoExampleData = 0;
+    QTimeEvt_ctor(&me->timeEvt, TIMEOUT_SIG);
 }
 
 
@@ -89,15 +92,16 @@ static QState IceMgr_initial(IceMgr *me, QEvent const *e) {
     QS_OBJ_DICTIONARY(&l_iceMgr);
     QS_FUN_DICTIONARY(&QHsm_top);
     QS_FUN_DICTIONARY(&IceMgr_initial);
-    QS_FUN_DICTIONARY(&IceMgr_running);
+    QS_FUN_DICTIONARY(&IceMgr_stopped);
+    QS_FUN_DICTIONARY(&IceMgr_delivering);
 
     QS_SIG_DICTIONARY(DELIVER_ICE_CUBE_SIG,     0);
     QS_SIG_DICTIONARY(TERMINATE_SIG,     0);
 
-    return Q_TRAN(&IceMgr_running);
+    return Q_TRAN(&IceMgr_stopped);
 }
 /*..........................................................................*/
-static QState IceMgr_running(IceMgr *me, QEvent const *e) {
+static QState IceMgr_stopped(IceMgr *me, QEvent const *e) {
 
     switch (e->sig) {
         case TERMINATE_SIG: {
@@ -105,16 +109,42 @@ static QState IceMgr_running(IceMgr *me, QEvent const *e) {
             return Q_HANDLED();
         }
         case DELIVER_ICE_CUBE_SIG: {
-            /* TODO: start ice cube delivery process here */
-            Uint8Evt *ue;
-            ue = Q_NEW(Uint8Evt, ENABLE_RELAY_SIG);
-            ue->data = 1;  /* TODO: use correct relay number here */
-            QF_PUBLISH((QEvent *)ue, me);
-
-            omxEval_led_toggle(LED_3);  /* for debugging purposes */
-            return Q_HANDLED();
+            return Q_TRAN(&IceMgr_delivering);
         }
     }
     return Q_SUPER(&QHsm_top);
 }
 
+/*..........................................................................*/
+static QState IceMgr_delivering(IceMgr *me, QEvent const *e) {
+
+  switch (e->sig) {
+      case TERMINATE_SIG: {
+          QF_stop();
+          return Q_HANDLED();
+      }
+      case Q_ENTRY_SIG: {
+          /* switch relay on */
+          Uint8Evt *ue;
+          ue = Q_NEW(Uint8Evt, ENABLE_RELAY_SIG);
+          ue->data = 1;  /* TODO: use correct relay number here */
+          QF_PUBLISH((QEvent *)ue, me);
+
+          /* start timeout */
+          QTimeEvt_postIn(&me->timeEvt, (QActive *)me, ICE_DELIVERY_TIME);
+          omxEval_led_on(LED_3);  /* for debugging purposes */
+          return Q_HANDLED();
+      }
+      case TIMEOUT_SIG: {
+          /* switch relay off */
+          Uint8Evt *ue;
+          ue = Q_NEW(Uint8Evt, DISABLE_RELAY_SIG);
+          ue->data = 1;  /* TODO: use correct relay number here */
+          QF_PUBLISH((QEvent *)ue, me);
+
+          omxEval_led_off(LED_3);  /* for debugging purposes */
+          return Q_TRAN(&IceMgr_stopped);
+      }
+  }
+  return Q_SUPER(&QHsm_top);
+}

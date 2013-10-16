@@ -137,6 +137,7 @@ QState Table_serving(Table *me, QEvent const *e) {
 void Table_displayInit(Table *me) {
     /* init LCD display here, if available */
     LCDPutStr("IP:", 110, 5, SMALL, BLACK, WHITE);
+    LCDPutStr("CMD:", 80, 5, LARGE, RED, WHITE);
     LCDPutStr("CGI:", 50, 5, LARGE, RED, WHITE);
     LCDPutStr("UDP:", 20, 5, LARGE, BROWN, WHITE);
 

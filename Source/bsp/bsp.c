@@ -191,6 +191,7 @@ void Q_onAssert(char const * const file, int line) {
     (void)file;                                   /* avoid compiler warning */
     (void)line;                                   /* avoid compiler warning */
     QF_INT_DISABLE();         /* make sure that all interrupts are disabled */
+    LCDPutStr("Assertion failed", 5, 5, SMALL, BROWN, WHITE);
     for (;;) {       /* NOTE: replace the loop with reset for final version */
     }
 }
