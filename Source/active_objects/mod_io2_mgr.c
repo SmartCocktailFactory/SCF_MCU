@@ -102,7 +102,6 @@ static QState ModIo2Mgr_initial(ModIo2Mgr *me, QEvent const *e) {
 
     if (ModIO2_init() == Error)
     {
-      omxEval_led_on(LED_1);
       LCDPutStr("Err MODIO2 init", 110, 5, LARGE, RED, WHITE);
       return Q_UNHANDLED();
     }
@@ -121,13 +120,13 @@ static QState ModIo2Mgr_running(ModIo2Mgr *me, QEvent const *e) {
         }
         case ENABLE_RELAY_SIG: {
             modIo2Mgr_enableRelay(((Uint8Evt*)e)->data);
-            omxEval_led_on(LED_4);  /* for debugging purposes */
+            //omxEval_led_on(LED_4);  /* for debugging purposes */
             return Q_HANDLED();
         }
         case DISABLE_RELAY_SIG: {
             /* TODO: disable the relay here, relay number can be obtained from event data */
             modIo2Mgr_disableRelay(((Uint8Evt*)e)->data);
-            omxEval_led_off(LED_4);  /* for debugging purposes */
+            //omxEval_led_off(LED_4);  /* for debugging purposes */
             return Q_HANDLED();
         }
     }

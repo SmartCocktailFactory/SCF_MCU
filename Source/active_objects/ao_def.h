@@ -21,6 +21,7 @@ enum ScfSignals {
    PROCESS_UDP_SIG,        /* DataEvt type; published by lwipmgr if a udp packet has been received */
    ENABLE_RELAY_SIG,       /* Uint8Evt type with relay number; published by iceMgr if relay should be enabled (switched on) */
    DISABLE_RELAY_SIG,      /* Uint8Evt type with relay number; published by iceMgr if relay should be disabled (switched off) */
+   ICE_CUBE_DETECTED,      /* published by ice detection manager, when an ice cube has been detected */
    TERMINATE_SIG,          /* published by BSP to terminate the application */
    MAX_PUB_SIG,                                /* the last published signal */
 
@@ -52,11 +53,13 @@ void LwIPMgr_ctor(void);
 void MgtProtocolHandler_ctor(void);
 void IceMgr_ctor(void);
 void ModIo2Mgr_ctor(void);
+void IceDetectionMgr_ctor(void);
 
 extern QActive * const AO_Table;                /* "opaque" pointer  to Table AO */
 extern QActive * const AO_LwIPMgr;              /* "opaque" pointer  to LwIPMgr AO */
 extern QActive * const AO_MgtProtocolHandler;   /* "opaque" pointer  to MgtProtocolHandler AO */
 extern QActive * const AO_IceMgr;               /* "opaque" pointer  to IceMgr AO */
 extern QActive * const AO_ModIo2Mgr;            /* "opaque" pointer  to ModIo2Mgr AO */
+extern QActive * const AO_IceDetectionMgr;      /* "opaque" pointer  to IceDetectorMgr AO */
 
 #endif

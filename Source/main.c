@@ -36,6 +36,7 @@ static QEvent const *l_lwIPMgrQueueSto[10];
 static QEvent const *l_mgtProtocolHandlerSto[10];
 static QEvent const *l_iceMgrSto[5];
 static QEvent const *l_modIo2MgrSto[5];
+static QEvent const *l_iceDetectionMgrSto[5];
 static QSubscrList   l_subscrSto[MAX_PUB_SIG];
 
 static union SmallEvents {
@@ -60,12 +61,13 @@ int main(void) {
     MgtProtocolHandler_ctor();  /* instantiate the MgtProtocolHandler active object */
     IceMgr_ctor();              /* instantiate the IceMgr active object */
     ModIo2Mgr_ctor();           /* instantiate the ModIo2Mgr active object */
+    IceDetectionMgr_ctor();     /* instantiate the IceDetectionMgr active object */
 
-    BSP_init();                     /* initialize the Board Support Package */
+    BSP_init();                 /* initialize the Board Support Package */
 
-    QF_init();     /* initialize the framework and the underlying RT kernel */
+    QF_init();                  /* initialize the framework and the underlying RT kernel */
 
-                                                  /* object dictionaries... */
+    /* object dictionaries... */
     QS_OBJ_DICTIONARY(l_smlPoolSto);
     QS_OBJ_DICTIONARY(l_medPoolSto);
     QS_OBJ_DICTIONARY(l_lwIPMgrQueueSto);
@@ -73,13 +75,16 @@ int main(void) {
     QS_OBJ_DICTIONARY(l_mgtProtocolHandlerSto);
     QS_OBJ_DICTIONARY(l_iceMgrSto);
     QS_OBJ_DICTIONARY(l_modIo2MgrSto);
+    QS_OBJ_DICTIONARY(l_iceDetectionMgrSto);
 
-    QF_psInit(l_subscrSto, Q_DIM(l_subscrSto));   /* init publish-subscribe */
+    /* init publish-subscribe */
+    QF_psInit(l_subscrSto, Q_DIM(l_subscrSto));
 
     /* initialize event pools... */
     QF_poolInit(l_smlPoolSto, sizeof(l_smlPoolSto), sizeof(l_smlPoolSto[0]));
     QF_poolInit(l_medPoolSto, sizeof(l_medPoolSto), sizeof(l_medPoolSto[0]));
 
+    /* start active objects */
     QActive_start(AO_LwIPMgr, 1,
                   l_lwIPMgrQueueSto, Q_DIM(l_lwIPMgrQueueSto),
                   (void *)0, 0, (QEvent *)0);
@@ -100,7 +105,12 @@ int main(void) {
                   l_modIo2MgrSto, Q_DIM(l_modIo2MgrSto),
                   (void *)0, 0, (QEvent *)0);
 
-    QF_run();                                     /* run the QF application */
+    QActive_start(AO_IceDetectionMgr, 11,
+                  l_iceDetectionMgrSto, Q_DIM(l_iceDetectionMgrSto),
+                  (void *)0, 0, (QEvent *)0);
+
+    /* run the QF application */
+    QF_run();
 
     return 1;
 }
