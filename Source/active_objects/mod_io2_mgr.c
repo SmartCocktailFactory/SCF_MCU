@@ -51,6 +51,7 @@ typedef struct ModIo2MgrTag {
 static QState ModIo2Mgr_initial(ModIo2Mgr *me, QEvent const *e);
 static QState ModIo2Mgr_running(ModIo2Mgr *me, QEvent const *e);
 static void modIo2Mgr_enableRelay(uint8_t relayNumber);
+static void modIo2Mgr_disableRelay(uint8_t relayNumber);
 
 
 /****************************************************************************************
@@ -115,6 +116,7 @@ static QState ModIo2Mgr_running(ModIo2Mgr *me, QEvent const *e) {
         }
         case DISABLE_RELAY_SIG: {
             /* TODO: disable the relay here, relay number can be obtained from event data */
+            modIo2Mgr_disableRelay(((Uint8Evt*)e)->data);
             omxEval_led_off(LED_4);  /* for debugging purposes */
             return Q_HANDLED();
         }
@@ -131,6 +133,20 @@ static void modIo2Mgr_enableRelay(uint8_t relayNumber)
     break;
   case 2u:
     ModIO2_enableRelay2();
+    break;
+  default:
+    break;
+  }
+}
+
+static void modIo2Mgr_disableRelay(uint8_t relayNumber)
+{
+  switch (relayNumber) {
+  case 1u:
+    ModIO2_disableRelay1();
+    break;
+  case 2u:
+    ModIO2_disableRelay2();
     break;
   default:
     break;
