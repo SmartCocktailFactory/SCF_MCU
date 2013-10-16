@@ -121,10 +121,12 @@ QState Table_serving(Table *me, QEvent const *e) {
             Table_displayUdpText(me, ((TextEvt *)e)->text);
             ++me->udpCtr;
 
+#if 0  /* do not send udp packet back to host */
             te = Q_NEW(TextEvt, SEND_UDP_SIG);
             snprintf(te->text, Q_DIM(te->text), "%s-%d",
                      ((TextEvt const *)e)->text, (int)me->udpCtr);
             QACTIVE_POST(AO_LwIPMgr, (QEvent *)te, me);    /* post directly */
+#endif
 
             return Q_HANDLED();
         }

@@ -344,7 +344,9 @@ static void udp_rx_handler(void *arg, struct udp_pcb *upcb,
     de->usedDataBufferLength = usedBufferLength;
     QF_PUBLISH((QEvent *)de, AO_LwIPMgr);
 
+#if 0   /* do not connect to host */
     udp_connect(upcb, addr, port);            /* connect to the remote host */
+#endif
     pbuf_free(p);                                   /* don't leak the pbuf! */
 }
 
