@@ -160,6 +160,6 @@ static void mgtProtocolHandler_processDeliverIceCube(MgtProtocolHandler *me, con
 {
   Uint8Evt *ue;
   ue = Q_NEW(Uint8Evt, DELIVER_ICE_CUBE_SIG);
-  ue->data = 5;  /* TODO: use number of ice cubes here */
+  ue->data = 1;  /* TODO: use number of ice cubes here */
   QACTIVE_POST(AO_IceMgr, (QEvent *)ue, me);    /* post directly */
 }
