@@ -182,10 +182,15 @@ QState LwIPMgr_running(LwIPMgr *me, QEvent const *e) {
 
         case SEND_UDP_SIG: {
             if (me->upcb->remote_port != (uint16_t)0) {
+#if 0
                 struct pbuf *p = pbuf_new((u8_t *)((TextEvt const *)e)->text,
                                       strlen(((TextEvt const *)e)->text) + 1);
+#endif
+                struct pbuf *p = pbuf_new((u8_t *)((DataEvt const *)e)->dataBuffer,
+                                      (uint16_t)((DataEvt const *)e)->usedDataBufferLength);
                 if (p != (struct pbuf *)0) {
                     udp_send(me->upcb, p);
+                    udp_disconnect(me->upcb);
                     printf("Sent: %s\n", ((TextEvt const *)e)->text);
                     pbuf_free(p);                   /* don't leak the pbuf! */
                 }
@@ -340,13 +345,13 @@ static void udp_rx_handler(void *arg, struct udp_pcb *upcb,
     } else {
       usedBufferLength = DATA_EVT_BUFFER_SIZE;
     }
-    memcpy(de->dataBuffer, (char *)p->payload, usedBufferLength);
+    memcpy(de->dataBuffer, p->payload, usedBufferLength);
     de->usedDataBufferLength = usedBufferLength;
     QF_PUBLISH((QEvent *)de, AO_LwIPMgr);
 
-#if 0   /* do not connect to host */
+//#if 0   /* do not connect to host */
     udp_connect(upcb, addr, port);            /* connect to the remote host */
-#endif
+//#endif
     pbuf_free(p);                                   /* don't leak the pbuf! */
 }
 

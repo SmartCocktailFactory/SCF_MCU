@@ -154,6 +154,8 @@ static QState IceMgr_delivering(IceMgr *me, QEvent const *e) {
           ue->data = 1;  /* TODO: use correct relay number here */
           QF_PUBLISH((QEvent *)ue, me);
 
+          /* stop timeout */
+          QTimeEvt_disarm(&me->timeEvt);
           omxEval_led_off(LED_3);  /* for debugging purposes */
           return Q_HANDLED();
       }

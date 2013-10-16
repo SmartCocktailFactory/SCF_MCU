@@ -24,9 +24,13 @@
 /****************************************************************************************
  Defines
 *****************************************************************************************/
+#define MGT_PROTOCOL_VERSION           2u       /**< Program version */
 #define MGT_PROTOCOL_CMD_NUMBER_SIZE   4u       /**< Size of command number field in frame */
 
-#define MGT_PROTOCOL_CMD_DELIVER_ICE_CUBE   0x03u    /**< Number of DeliverIceCube command */
+#define MGT_PROTOCOL_CMD_GET_VERSION              0x01u    /**< Number of GetVersion command */
+#define MGT_PROTOCOL_CMD_ANSWER_GET_VERSION       0x02u    /**< Number of AnswerGetVersion command */
+#define MGT_PROTOCOL_CMD_DELIVER_ICE_CUBE         0x03u    /**< Number of DeliverIceCube command */
+#define MGT_PROTOCOL_CMD_ANSWER_DELIVER_ICE_CUBE  0x04u    /**< Number of AnswerDeliverIceCube command */
 
 #define COMMAND_NUMBER_STRING_SIZE  11u
 
@@ -57,6 +61,8 @@ static QState MgtProtocolHandler_initial(MgtProtocolHandler *me, QEvent const *e
 static QState MgtProtocolHandler_running(MgtProtocolHandler *me, QEvent const *e);
 static void mgtProtocolHandler_processFrame(MgtProtocolHandler *me, const uint8_t *frameContent, uint32_t frameLength);
 static void mgtProtocolHandler_processDeliverIceCube(MgtProtocolHandler *me, const uint8_t *payload, uint32_t payloadLength);
+static void mgtProtocolHandler_generateDeliveryIceCubeAnswer(MgtProtocolHandler *me, uint8_t status);
+static void mgtProtocolHandler_processGetVersion(MgtProtocolHandler *me, const uint8_t *payload, uint32_t payloadLength);
 
 
 /****************************************************************************************
@@ -119,11 +125,11 @@ static QState MgtProtocolHandler_running(MgtProtocolHandler *me, QEvent const *e
             return Q_HANDLED();
         }
         case ICE_CUBE_DELIVERY_DONE_SIG: {
-            // TODO: return delivery done
+            mgtProtocolHandler_generateDeliveryIceCubeAnswer(me, 0u);
             return Q_HANDLED();
         }
         case ICE_CUBE_DELIVERY_TMO_SIG: {
-            // TODO: return delivery failure
+            mgtProtocolHandler_generateDeliveryIceCubeAnswer(me, 2u);
             return Q_HANDLED();
         }
     }
@@ -149,6 +155,9 @@ static void mgtProtocolHandler_processFrame(MgtProtocolHandler *me, const uint8_
     LCDPutStr(commandNumberString, 80, 40, LARGE, RED, WHITE);
 
     switch (commandNumber) {
+    case MGT_PROTOCOL_CMD_GET_VERSION:
+      mgtProtocolHandler_processGetVersion(me, frameContent + MGT_PROTOCOL_CMD_NUMBER_SIZE, frameLength - MGT_PROTOCOL_CMD_NUMBER_SIZE);
+      break;
     case MGT_PROTOCOL_CMD_DELIVER_ICE_CUBE:
       mgtProtocolHandler_processDeliverIceCube(me, frameContent + MGT_PROTOCOL_CMD_NUMBER_SIZE, frameLength - MGT_PROTOCOL_CMD_NUMBER_SIZE);
       break;
@@ -167,7 +176,46 @@ static void mgtProtocolHandler_processFrame(MgtProtocolHandler *me, const uint8_
 static void mgtProtocolHandler_processDeliverIceCube(MgtProtocolHandler *me, const uint8_t *payload, uint32_t payloadLength)
 {
   Uint8Evt *ue;
-  ue = Q_NEW(Uint8Evt, DELIVER_ICE_CUBE_SIG);
-  ue->data = 1;  /* TODO: use number of ice cubes here */
-  QACTIVE_POST(AO_IceMgr, (QEvent *)ue, me);    /* post directly */
+
+  if (payloadLength >= 1u) {
+      ue = Q_NEW(Uint8Evt, DELIVER_ICE_CUBE_SIG);
+      ue->data = payload[0];
+      QACTIVE_POST(AO_IceMgr, (QEvent *)ue, me);    /* post directly */
+  }
+  else {
+      mgtProtocolHandler_generateDeliveryIceCubeAnswer(me, 1u);
+  }
+}
+
+/**
+ * Generate an AnswerDeliveryIceCube packet.
+ *
+ * @param me the pointer to the current active object
+ * @param status the delivery status
+ */
+static void mgtProtocolHandler_generateDeliveryIceCubeAnswer(MgtProtocolHandler *me, uint8_t status) {
+  DataEvt *de;
+  de = Q_NEW(DataEvt, SEND_UDP_SIG);
+  *((uint32_t *)&de->dataBuffer[0]) = htonl(MGT_PROTOCOL_CMD_ANSWER_DELIVER_ICE_CUBE);
+  de->dataBuffer[4] = status;
+  de->usedDataBufferLength = 5u;
+  QACTIVE_POST(AO_LwIPMgr, (QEvent *)de, me);     /* post directly */
+}
+
+/**
+ * Process the command GetVersion.
+ *
+ * @param me the pointer to the current active object
+ * @param payload the payload of the received frame
+ * @param frameLength the length of the payload
+ */
+static void mgtProtocolHandler_processGetVersion(MgtProtocolHandler *me, const uint8_t *payload, uint32_t payloadLength) {
+  (void)payload;
+  (void)payloadLength;
+  DataEvt *de;
+  de = Q_NEW(DataEvt, SEND_UDP_SIG);
+  *((uint32_t *)&de->dataBuffer[0]) = htonl(MGT_PROTOCOL_CMD_ANSWER_GET_VERSION);
+  *((uint16_t *)&de->dataBuffer[4]) = htons(MGT_PROTOCOL_VERSION);
+  de->usedDataBufferLength = 6u;
+  QACTIVE_POST(AO_LwIPMgr, (QEvent *)de, me);     /* post directly */
 }
