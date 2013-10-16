@@ -17,14 +17,13 @@
 #include <stdio.h>
 #include "omx_p207_eval/ice_detector/ice_detector.h"
 #include "omx_p207_eval/led/led.h"
-#include "omx_p207_eval/lcd/lcd.h"
 
 
 /****************************************************************************************
  Defines
 *****************************************************************************************/
 
-#define ICE_DETECTION_TIME   (BSP_TICKS_PER_SEC / 10) /* 2ms */
+#define ICE_DETECTION_TIME   (BSP_TICKS_PER_SEC / 500) /* 2ms */
 
 /****************************************************************************************
  Enums
@@ -100,7 +99,8 @@ static QState IceDetectionMgr_initial(IceDetectionMgr *me, QEvent const *e) {
     QS_FUN_DICTIONARY(&IceDetectionMgr_running_maybe_ice);
     QS_FUN_DICTIONARY(&IceDetectionMgr_running_ice);
 
-    QS_SIG_DICTIONARY(TERMINATE_SIG,     0);
+    QS_SIG_DICTIONARY(TERMINATE_SIG, 0);
+    QS_SIG_DICTIONARY(ICE_CUBE_DETECTED_SIG, 0);
 
     return Q_TRAN(&IceDetectionMgr_running);
 }
@@ -131,10 +131,6 @@ static QState IceDetectionMgr_running(IceDetectionMgr *me, QEvent const *e) {
 
 static QState IceDetectionMgr_running_no_ice(IceDetectionMgr * const me, QEvt const * const e) {
   switch (e->sig) {
-      case Q_ENTRY_SIG: {
-          LCDPutStr("N ICE", 110, 5, LARGE, RED, WHITE);
-          return Q_HANDLED();
-      }
       case TIMEOUT_SIG: {
           if (omsEval_ice_status() == ICE) {
               return Q_TRAN(&IceDetectionMgr_running_maybe_ice);
@@ -149,10 +145,6 @@ static QState IceDetectionMgr_running_no_ice(IceDetectionMgr * const me, QEvt co
 
 static QState IceDetectionMgr_running_maybe_ice(IceDetectionMgr * const me, QEvt const * const e) {
   switch (e->sig) {
-      case Q_ENTRY_SIG: {
-          LCDPutStr("M ICE", 110, 5, LARGE, RED, WHITE);
-          return Q_HANDLED();
-      }
       case TIMEOUT_SIG: {
           if (omsEval_ice_status() == ICE) {
               return Q_TRAN(&IceDetectionMgr_running_ice);
@@ -168,8 +160,7 @@ static QState IceDetectionMgr_running_maybe_ice(IceDetectionMgr * const me, QEvt
 static QState IceDetectionMgr_running_ice(IceDetectionMgr * const me, QEvt const * const e) {
     switch (e->sig) {
         case Q_ENTRY_SIG: {
-          LCDPutStr("  ICE", 110, 5, LARGE, RED, WHITE);
-          QF_PUBLISH(Q_NEW(QEvent, ICE_CUBE_DETECTED), me);
+          QF_PUBLISH(Q_NEW(QEvent, ICE_CUBE_DETECTED_SIG), me);
           omxEval_led_on(LED_4);
           return Q_HANDLED();
         }

@@ -21,7 +21,7 @@ enum ScfSignals {
    PROCESS_UDP_SIG,        /* DataEvt type; published by lwipmgr if a udp packet has been received */
    ENABLE_RELAY_SIG,       /* Uint8Evt type with relay number; published by iceMgr if relay should be enabled (switched on) */
    DISABLE_RELAY_SIG,      /* Uint8Evt type with relay number; published by iceMgr if relay should be disabled (switched off) */
-   ICE_CUBE_DETECTED,      /* published by ice detection manager, when an ice cube has been detected */
+   ICE_CUBE_DETECTED_SIG,  /* published by ice detection manager, when an ice cube has been detected */
    TERMINATE_SIG,          /* published by BSP to terminate the application */
    MAX_PUB_SIG,                                /* the last published signal */
 

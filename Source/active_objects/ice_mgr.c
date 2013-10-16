@@ -88,6 +88,7 @@ static QState IceMgr_initial(IceMgr *me, QEvent const *e) {
     (void)e;        /* suppress the compiler warning about unused parameter */
 
     QActive_subscribe((QActive *)me, TERMINATE_SIG);
+    QActive_subscribe((QActive *)me, ICE_CUBE_DETECTED_SIG);
 
     QS_OBJ_DICTIONARY(&l_iceMgr);
     QS_FUN_DICTIONARY(&QHsm_top);
@@ -95,8 +96,10 @@ static QState IceMgr_initial(IceMgr *me, QEvent const *e) {
     QS_FUN_DICTIONARY(&IceMgr_stopped);
     QS_FUN_DICTIONARY(&IceMgr_delivering);
 
-    QS_SIG_DICTIONARY(DELIVER_ICE_CUBE_SIG,     0);
-    QS_SIG_DICTIONARY(TERMINATE_SIG,     0);
+    QS_SIG_DICTIONARY(DELIVER_ICE_CUBE_SIG, 0);
+    QS_SIG_DICTIONARY(TERMINATE_SIG, 0);
+    QS_SIG_DICTIONARY(ICE_CUBE_DETECTED_SIG, 0);
+
 
     return Q_TRAN(&IceMgr_stopped);
 }
@@ -135,7 +138,7 @@ static QState IceMgr_delivering(IceMgr *me, QEvent const *e) {
           omxEval_led_on(LED_3);  /* for debugging purposes */
           return Q_HANDLED();
       }
-      case TIMEOUT_SIG: {
+      case Q_EXIT_SIG: {
           /* switch relay off */
           Uint8Evt *ue;
           ue = Q_NEW(Uint8Evt, DISABLE_RELAY_SIG);
@@ -143,6 +146,10 @@ static QState IceMgr_delivering(IceMgr *me, QEvent const *e) {
           QF_PUBLISH((QEvent *)ue, me);
 
           omxEval_led_off(LED_3);  /* for debugging purposes */
+          return Q_HANDLED();
+      }
+      case ICE_CUBE_DETECTED_SIG:
+      case TIMEOUT_SIG: {
           return Q_TRAN(&IceMgr_stopped);
       }
   }
