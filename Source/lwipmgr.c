@@ -55,6 +55,9 @@ typedef struct LwIPMgrTag {
     struct udp_pcb *upcb;
     uint32_t        ip_addr;    /* IP address in the native host byte order */
 
+    ip_addr_t remote_ip_addr_udp;  /* ip addr from which the last udp packet has been received */
+    uint16_t remote_port_udp;      /* port from which the last udp packet has been received */
+
 #if LWIP_TCP
     uint32_t tcp_tmr;
 #endif
@@ -181,16 +184,11 @@ QState LwIPMgr_running(LwIPMgr *me, QEvent const *e) {
         }
 
         case SEND_UDP_SIG: {
-            if (me->upcb->remote_port != (uint16_t)0) {
-#if 0
-                struct pbuf *p = pbuf_new((u8_t *)((TextEvt const *)e)->text,
-                                      strlen(((TextEvt const *)e)->text) + 1);
-#endif
+            if (l_lwIPMgr.remote_port_udp != (uint16_t)0) {
                 struct pbuf *p = pbuf_new((u8_t *)((DataEvt const *)e)->dataBuffer,
                                       (uint16_t)((DataEvt const *)e)->usedDataBufferLength);
                 if (p != (struct pbuf *)0) {
-                    udp_send(me->upcb, p);
-                    udp_disconnect(me->upcb);
+                    udp_sendto(me->upcb, p, &l_lwIPMgr.remote_ip_addr_udp, l_lwIPMgr.remote_port_udp);
                     printf("Sent: %s\n", ((TextEvt const *)e)->text);
                     pbuf_free(p);                   /* don't leak the pbuf! */
                 }
@@ -349,9 +347,9 @@ static void udp_rx_handler(void *arg, struct udp_pcb *upcb,
     de->usedDataBufferLength = usedBufferLength;
     QF_PUBLISH((QEvent *)de, AO_LwIPMgr);
 
-//#if 0   /* do not connect to host */
-    udp_connect(upcb, addr, port);            /* connect to the remote host */
-//#endif
+    /* remember ip address and port of remote host (used to send UDP answer packet back to host */
+    l_lwIPMgr.remote_ip_addr_udp = *addr;
+    l_lwIPMgr.remote_port_udp = port;
     pbuf_free(p);                                   /* don't leak the pbuf! */
 }
 
