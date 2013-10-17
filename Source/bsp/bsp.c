@@ -38,6 +38,7 @@
 #include <omx_p207_eval/lcd/lcd.h>
 #include <omx_p207_eval/rs232/rs232.h>
 #include <omx_p207_eval/i2c/i2c.h>
+#include <omx_p207_eval/spi/spi.h>
 #include <omx_p207_eval/ice_detector/ice_detector.h>
 #include "qp_port.h"
 #include "active_objects/ao_def.h"
@@ -112,6 +113,9 @@ void BSP_init(void) {
 
   /* initialize I2C on Olimex P207 eval board */
   omxEval_i2c_init();
+
+  /* initialize SPI on Olimex P207 eval board */
+  omxEval_spi_init();
 
   /* initialize ice detection sensor on Olimex P207 eval board */
   omxEval_ice_init();
