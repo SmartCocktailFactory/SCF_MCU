@@ -28,7 +28,8 @@
 #include "qp_port.h"
 #include "active_objects/ao_def.h"
 #include "bsp.h"
-#include "active_objects/ao_def.h"
+#include "devices/modled8x8/modled8x8.h"
+#include "base/utils/utils.h"
 
 /* Local-scope objects -----------------------------------------------------*/
 static QEvent const *l_tableQueueSto[5];
@@ -66,6 +67,16 @@ int main(void) {
     BSP_init();                 /* initialize the Board Support Package */
 
     QF_init();                  /* initialize the framework and the underlying RT kernel */
+
+    /*
+    ModLED8x8_init();
+    while (1) {
+      ModLED8x8_scrollString("*** RES Smart Cocktail Factory ***", SCROLL_RIGHT);
+      delayMs(500);
+      ModLED8x8_scrollString("*** RES Smart Cocktail Factory ***", SCROLL_LEFT);
+      delayMs(500);
+    }
+    */
 
     /* object dictionaries... */
     QS_OBJ_DICTIONARY(l_smlPoolSto);

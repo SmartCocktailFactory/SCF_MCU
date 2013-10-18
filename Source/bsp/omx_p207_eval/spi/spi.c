@@ -1,9 +1,9 @@
 /****************************************************************************************
-                         Copyright (C) Zuehlke Engineering
-                              All Rights Reserved
+ Copyright (C) Zuehlke Engineering
+ All Rights Reserved
  ****************************************************************************************
 
-  DESCRIPTION:        Implementation of the SPI driver.
+ DESCRIPTION:        Implementation of the SPI driver.
 
  ****************************************************************************************/
 
@@ -38,7 +38,7 @@
 /** Configure and enable the I2C interface. */
 static void Enable_Interface() {
 
-  SPI_InitTypeDef  SPI_InitStructure;
+  SPI_InitTypeDef SPI_InitStructure;
 
   SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
   SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
@@ -80,15 +80,15 @@ void omxEval_spi_init() {
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
 
   GPIO_InitStructure.GPIO_Pin = OMX_EVAL_SPI_UEXT_SCK_PIN;
   GPIO_Init(OMX_EVAL_SPI_UEXT_SCK_PORT, &GPIO_InitStructure);
 
-  GPIO_InitStructure.GPIO_Pin =  OMX_EVAL_SPI_UEXT_MOSI_PIN;
+  GPIO_InitStructure.GPIO_Pin = OMX_EVAL_SPI_UEXT_MOSI_PIN;
   GPIO_Init(OMX_EVAL_SPI_UEXT_MOSI_PORT, &GPIO_InitStructure);
 
-  GPIO_InitStructure.GPIO_Pin =  OMX_EVAL_SPI_UEXT_MISO_PIN;
+  GPIO_InitStructure.GPIO_Pin = OMX_EVAL_SPI_UEXT_MISO_PIN;
   GPIO_Init(OMX_EVAL_SPI_UEXT_MISO_PORT, &GPIO_InitStructure);
 
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
@@ -101,7 +101,7 @@ void omxEval_spi_init() {
   GPIO_SetBits(OMX_EVAL_SPI_UEXT_CS_PORT, OMX_EVAL_SPI_UEXT_CS_PIN);
 }
 
-ErrorStatus omsEval_spi_write(uint8_t address, size_t length, const uint8_t* data) {
+ErrorStatus omsEval_spi_write(size_t length, const uint8_t* data) {
 
   __IO uint32_t timeout = 0U;
 
@@ -124,7 +124,7 @@ ErrorStatus omsEval_spi_write(uint8_t address, size_t length, const uint8_t* dat
   return SUCCESS;
 }
 
-ErrorStatus omsEval_spi_readWrite(uint8_t address, size_t length, const uint8_t* out, uint8_t* in) {
+ErrorStatus omsEval_spi_readWrite(size_t length, const uint8_t* out, uint8_t* in) {
 
   __IO uint32_t timeout = 0U;
 
@@ -146,7 +146,7 @@ ErrorStatus omsEval_spi_readWrite(uint8_t address, size_t length, const uint8_t*
         return ERROR;
       }
     }
-    *in = (uint8_t)SPI_I2S_ReceiveData(OMX_EVAL_SPI_UEXT);
+    *in = (uint8_t) SPI_I2S_ReceiveData(OMX_EVAL_SPI_UEXT);
     length--;
     in++;
     out++;
