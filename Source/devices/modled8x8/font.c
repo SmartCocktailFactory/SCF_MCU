@@ -1,3 +1,12 @@
+/****************************************************************************************
+ Copyright (C) Zuehlke Engineering
+ All Rights Reserved
+ ****************************************************************************************
+
+ DESCRIPTION:        Font definition for the MOD-LED8x8RGB extension board device.
+
+ ****************************************************************************************/
+
 #include <stdint.h>
 
 const uint8_t ModLED8x8_FontLookup[][5] = {

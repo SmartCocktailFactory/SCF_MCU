@@ -3,7 +3,7 @@
  All Rights Reserved
  ****************************************************************************************
 
- DESCRIPTION:        Interface of the MODLED8x8 extension board device.
+ DESCRIPTION:        Interface of the MOD-LED8x8RGB extension board device.
 
  ****************************************************************************************/
 

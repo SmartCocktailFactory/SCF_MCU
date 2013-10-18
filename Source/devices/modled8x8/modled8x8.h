@@ -3,7 +3,7 @@
  All Rights Reserved
  ****************************************************************************************
 
- DESCRIPTION:        Interface of the MODLED8x8 extension board device.
+ DESCRIPTION:        Interface of the MOD-LED8x8RGB extension board device.
 
  ****************************************************************************************/
 
@@ -19,7 +19,7 @@ typedef enum {
 /** The font lookup table. */
 extern const uint8_t ModLED8x8_FontLookup[][5];
 
-/** Initialize the MODLED8x8 board. */
+/** Initialize the MOD-LED8x8RGB board. */
 void ModLED8x8_init();
 
 /** clear the video buffer. */
